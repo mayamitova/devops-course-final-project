@@ -36,6 +36,8 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
       - name: Execute Jacoco Report
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew sonarqube -Dsonar.login=${{ secrets.SONAR_TOKEN }}
   # This workflow contains a single job called "build"
   build:
