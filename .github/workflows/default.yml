@@ -44,7 +44,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Run Snyk to check for vulnerabilities
-      - uses: snyk/actions/gradle-jdk11@master
+        uses: snyk/actions/gradle-jdk11@master
 #        run: snyk test --sarif-file-output=snyk-sarif.json
         continue-on-error: true # To make sure that SARIF upload gets called
         env:
