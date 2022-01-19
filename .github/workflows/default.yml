@@ -48,7 +48,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --severity-threshold=medium
+          args: --severity-threshold=critical
   # This workflow contains a single job called "build"
   build:
     needs: [SAST, security]
