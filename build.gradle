@@ -1,9 +1,13 @@
+import com.bmuschko.gradle.docker.tasks.image.*
+
 plugins {
 	id 'org.springframework.boot' version '2.6.2'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'groovy'
 	id "org.sonarqube" version "3.3"
 	id 'jacoco'
+//	id 'com.bmuschko.docker-remote-api' version '7.0.1'
+//	id 'com.palantir.docker' version '0.22.1'
 }
 
 group = 'com.telerik'
@@ -27,12 +31,6 @@ dependencies {
 sonarqube {
 	properties {
 		property "sonar.login", System.getProperty('SONAR_TOKEN')
-//		property "sonar.projectName", "CoverageTestProject"
-//		property "sonar.projectKey", "coverageTestProject"
-////		property "sonar.projectVersion", project.version
-////		property "sonar.branch.name", "${System.getProperty('BRANCH_NAME')}"
-//		property "sonar.sources", "src/main, build.gradle"
-//		property "sonar.coverage.exclusions", "**/*Exception.java,**/migration/Migration*.java,**/*Config.java"
 	}
 }
 
@@ -51,15 +49,19 @@ tasks.named('sonarqube').configure {
 	dependsOn test
 }
 
-//jacocoTestReport {
-//	reports {
-//		xml.enabled true
-//		csv.enabled false
-//		html.enabled false
+//tasks.register('dockerBuildImage', DockerBuildImage) {
+//	inputDir = file('.')
+//	tag = 'telerik/devops-final-project'
+//	configure {
+//		dependsOn build
 //	}
-//
-//	getExecutionData().setFrom(fileTree(buildDir).include("/jacoco/jacocoTest.exec"))
 //}
+
+//docker {
+//	name "telerik/${project.name}:${project.version}"
+//	files "build/libs/build/libs/devops-final-project-${project.version}.jar"
+//}
+
 
 jacocoTestReport {
 	reports {
