@@ -1,7 +1,5 @@
 package com.telerik.jpa
 
-import org.hibernate.annotations.Type
-
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
@@ -9,13 +7,13 @@ import javax.persistence.Id
 import javax.persistence.Table
 
 @Entity
-@Table(name = "user")
-class User {
+@Table(name = "course")
+class Course {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   Long id
 
-  String login
-  String password
+  String title
+  String presenter
 }

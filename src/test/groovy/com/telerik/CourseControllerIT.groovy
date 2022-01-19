@@ -1,8 +1,8 @@
 package com.telerik
 
-import com.telerik.jpa.User
-import com.telerik.jpa.UserRepository
-import com.telerik.service.UserService
+import com.telerik.jpa.Course
+import com.telerik.jpa.CourseRepository
+import com.telerik.service.CourseService
 import org.hamcrest.CoreMatchers
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -23,41 +23,41 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 //@ContextConfiguration(classes = [UserController, UserService])
 //@WebMvcTest
 @SpringBootTest
-class UserControllerIT {
+class CourseControllerIT {
 
   @Autowired
   MockMvc mockMvc
 
   @Autowired
-  UserRepository userRepository
+  CourseRepository courseRepository
 
   @Autowired
-  UserService userService
+  CourseService courseService
 
-  User user
+  Course course
 
   @BeforeEach
   void setUp() {
-    user = new User(login: 'testUser')
+    course = new Course(title: 'Telerik DevOps', presenter: 'Dani')
 
 
-    user = userRepository.save(user)
+    course = courseRepository.save(course)
   }
 
 
   @AfterEach
   void cleanUp() {
-    userRepository.deleteById(user.id)
+    courseRepository.deleteById(course.id)
   }
 
   @Test
   void userById() {
-    mockMvc.perform(MockMvcRequestBuilders.get("/user/${user.id}")
+    mockMvc.perform(MockMvcRequestBuilders.get("/course/${course.id}")
       .contentType(MediaType.APPLICATION_JSON))
       .andExpect(status().isOk())
       .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-      .andExpect(jsonPath('$.login', CoreMatchers.is(user.login)))
-
+      .andExpect(jsonPath('$.title', CoreMatchers.is(course.title)))
+      .andExpect(jsonPath('$.presenter', CoreMatchers.is(course.presenter)))
   }
 
   @Test
