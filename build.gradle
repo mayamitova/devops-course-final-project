@@ -24,17 +24,17 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-//sonarqube {
-//	properties {
-//		property "sonar.host.url", "https://sonarcloud.io"
+sonarqube {
+	properties {
+		property "sonar.login", System.getProperty('SONAR_TOKEN')
 //		property "sonar.projectName", "CoverageTestProject"
 //		property "sonar.projectKey", "coverageTestProject"
 ////		property "sonar.projectVersion", project.version
 ////		property "sonar.branch.name", "${System.getProperty('BRANCH_NAME')}"
 //		property "sonar.sources", "src/main, build.gradle"
 //		property "sonar.coverage.exclusions", "**/*Exception.java,**/migration/Migration*.java,**/*Config.java"
-//	}
-//}
+	}
+}
 
 test {
 	// use Junit 5
