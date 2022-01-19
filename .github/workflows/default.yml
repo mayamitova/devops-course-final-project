@@ -47,8 +47,8 @@ jobs:
         uses: snyk/actions/gradle-jdk11@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-#        with:
-#          args: --severity-threshold=high
+        with:
+          args: --severity-threshold=medium
   # This workflow contains a single job called "build"
   build:
     needs: [SAST, security]
