@@ -14,10 +14,8 @@ class UserController {
   UserService userService
 
   @GetMapping("/user/{id}")
-  User getUserById(@PathVariable('id') String id) {
-    new User(login: 'test')
-
-//    userService.getUserById(id)
+  User getUserById(@PathVariable('id') Long id) {
+    userService.getUserById(id)
   }
 
   @GetMapping("/user/login/{login}")

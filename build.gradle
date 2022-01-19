@@ -2,6 +2,8 @@ plugins {
 	id 'org.springframework.boot' version '2.6.2'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'groovy'
+	id "org.sonarqube" version "3.3"
+	id 'jacoco'
 }
 
 group = 'com.telerik'
@@ -22,6 +24,46 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
+//sonarqube {
+//	properties {
+//		property "sonar.host.url", "https://sonarcloud.io"
+//		property "sonar.projectName", "CoverageTestProject"
+//		property "sonar.projectKey", "coverageTestProject"
+////		property "sonar.projectVersion", project.version
+////		property "sonar.branch.name", "${System.getProperty('BRANCH_NAME')}"
+//		property "sonar.sources", "src/main, build.gradle"
+//		property "sonar.coverage.exclusions", "**/*Exception.java,**/migration/Migration*.java,**/*Config.java"
+//	}
+//}
+
 test {
+	// use Junit 5
 	useJUnitPlatform()
+
+	jacoco {
+		destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
+		classDumpDir = file("$buildDir/jacoco/classpathdumps")
+	}
 }
+
+
+tasks.named('sonarqube').configure {
+	dependsOn test
+}
+
+//jacocoTestReport {
+//	reports {
+//		xml.enabled true
+//		csv.enabled false
+//		html.enabled false
+//	}
+//
+//	getExecutionData().setFrom(fileTree(buildDir).include("/jacoco/jacocoTest.exec"))
+//}
+
+jacocoTestReport {
+	reports {
+		xml.enabled true
+	}
+}
+test.finalizedBy jacocoTestReport
