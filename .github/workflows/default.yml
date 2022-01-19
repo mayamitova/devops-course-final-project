@@ -33,12 +33,11 @@ jobs:
         with:
           java-version: 11
           distribution: 'adopt'
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
       - name: Execute Jacoco Report
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew sonarqube -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew sonarqube
   # This workflow contains a single job called "build"
   build:
     needs: [validate-gradle, SAST]
