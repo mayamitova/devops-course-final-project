@@ -79,7 +79,7 @@ jobs:
         with:
           image: diyanfilipov/devops-final-project
           args: --file=Dockerfile
-            --severity-threshold=low
+            --severity-threshold=critical
             --sarif-file-output=docker.snyk.sarif
           sarif: false
       - name: Upload sarif file to Github Code Scanning
