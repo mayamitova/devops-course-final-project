@@ -62,7 +62,7 @@ jobs:
         run: ./gradlew build
       - name: Build a Docker image
         env:
-          IMAGE_TAG: ${ GITHUB_SHA::8 }
+          IMAGE_TAG: ${{ GITHUB_SHA::8 }}
         run: |
           docker build -t diyanfilipov/devops-final-project:${{ env.IMAGE_TAG }} . \
 
