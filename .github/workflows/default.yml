@@ -58,27 +58,42 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Build a Docker image
+      - name: Build project
         run: ./gradlew build
       - name: Build a Docker image
-        run: docker build -t diyanfilipov/test-image .
-      - name: Run Snyk to check Docker image for vulnerabilities
-        # Snyk can be used to break the build when it detects vulnerabilities.
-        # In this case we want to upload the issues to GitHub Code Scanning
-        continue-on-error: true
+        env:
+          IMAGE_TAG: ${ GITHUB_SHA::8 }
+        run: |
+          docker build -t diyanfilipov/devops-final-project:${{ env.IMAGE_TAG }} . \
+
+          docker tag diyanfilipov/devops-final-project:${{ env.IMAGE_TAG }} diyanfilipov/devops-final-project:latest
+      - name: Security scan on docker image
         uses: snyk/actions/docker@master
+        id: docker-image-scan
+        continue-on-error: true
         env:
           # In order to use the Snyk Action you will need to have a Snyk API token.
           # More details in https://github.com/snyk/actions#getting-your-snyk-token
           # or you can signup for free at https://snyk.io/login
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          image: diyanfilipov/test-image
+          image: diyanfilipov/devops-final-project
           args: --file=Dockerfile
-      - name: Upload result to GitHub Code Scanning
+            --severity-threshold=low
+            --sarif-file-output=docker.snyk.sarif
+          sarif: false
+      - name: Upload sarif file to Github Code Scanning
+        if: always()
         uses: github/codeql-action/upload-sarif@v1
         with:
-          sarif_file: snyk.sarif
+          sarif_file: docker.snyk.sarif
+      - name: Check docker image scan status
+        if: ${{ steps.docker-image-scan.outcome == 'failure' }}
+        run: exit 1
+      - name: Publish docker image
+#        if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+        run: docker push --all-tags diyanfilipov/devops-final-project
+
 
 #  docker:
 ##    needs: [SAST, security]
