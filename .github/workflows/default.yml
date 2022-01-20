@@ -38,61 +38,61 @@ jobs:
 #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 #        run: ./gradlew sonarqube
-#  security:
-#    needs: validate-gradle
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@master
-#      - name: Run Snyk to check for vulnerabilities
-#        uses: snyk/actions/gradle-jdk11@master
-#        continue-on-error: true # To make sure that SARIF upload gets called
-#        env:
-#          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-#        with:
-#          args: "--severity-threshold=critical --sarif-file-output=snyk.sarif"
-#      - name: Upload result to GitHub Code Scanning
-#        uses: github/codeql-action/upload-sarif@v1
-#        with:
-#          sarif_file: snyk.sarif
-  docker-image-scan:
+  security:
+    needs: validate-gradle
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Build project
-        run: ./gradlew build
-      - name: Build a Docker image
+      - uses: actions/checkout@master
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/gradle-jdk11@master
+        continue-on-error: true # To make sure that SARIF upload gets called
         env:
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker build -t diyanfilipov/devops-final-project:${{ env.IMAGE_TAG }} . \
-
-          docker tag diyanfilipov/devops-final-project:${{ env.IMAGE_TAG }} diyanfilipov/devops-final-project:latest
-      - name: Security scan on docker image
-        uses: snyk/actions/docker@master
-        id: docker-image-scan
-        continue-on-error: true
-        env:
-          # In order to use the Snyk Action you will need to have a Snyk API token.
-          # More details in https://github.com/snyk/actions#getting-your-snyk-token
-          # or you can signup for free at https://snyk.io/login
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          image: diyanfilipov/devops-final-project
-          args: --file=Dockerfile
-            --severity-threshold=critical
-            --sarif-file-output=docker.snyk.sarif
-          sarif: false
-      - name: Upload sarif file to Github Code Scanning
-        if: always()
+          args: "--severity-threshold=critical --sarif-file-output=snyk.sarif"
+      - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v1
         with:
-          sarif_file: docker.snyk.sarif
-      - name: Check docker image scan status
-        if: ${{ steps.docker-image-scan.outcome == 'failure' }}
-        run: exit 1
-      - name: Publish docker image
-#        if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
-        run: docker push --all-tags diyanfilipov/devops-final-project
+          sarif_file: snyk.sarif
+#  docker-image-scan:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#      - name: Build project
+#        run: ./gradlew build
+#      - name: Build a Docker image
+#        env:
+#          IMAGE_TAG: ${{ github.sha }}
+#        run: |
+#          docker build -t diyanfilipov/devops-final-project:${{ env.IMAGE_TAG }} . \
+#
+#          docker tag diyanfilipov/devops-final-project:${{ env.IMAGE_TAG }} diyanfilipov/devops-final-project:latest
+#      - name: Security scan on docker image
+#        uses: snyk/actions/docker@master
+#        id: docker-image-scan
+#        continue-on-error: true
+#        env:
+#          # In order to use the Snyk Action you will need to have a Snyk API token.
+#          # More details in https://github.com/snyk/actions#getting-your-snyk-token
+#          # or you can signup for free at https://snyk.io/login
+#          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+#        with:
+#          image: diyanfilipov/devops-final-project
+#          args: --file=Dockerfile
+#            --severity-threshold=critical
+#            --sarif-file-output=docker.snyk.sarif
+#          sarif: false
+#      - name: Upload sarif file to Github Code Scanning
+#        if: always()
+#        uses: github/codeql-action/upload-sarif@v1
+#        with:
+#          sarif_file: docker.snyk.sarif
+#      - name: Check docker image scan status
+#        if: ${{ steps.docker-image-scan.outcome == 'failure' }}
+#        run: exit 1
+#      - name: Publish docker image
+##        if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+#        run: docker push --all-tags diyanfilipov/devops-final-project
 
 
 #  docker:
