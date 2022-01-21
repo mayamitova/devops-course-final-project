@@ -18,8 +18,8 @@ jobs:
         env:
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/devops-final-project:${{ env.IMAGE_TAG }} . \
-          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/devops-final-project:${{ env.IMAGE_TAG }} ${{ secrets.DOCKERHUB_USERNAME }}/devops-final-project:latest
+          docker build -t diyanfilipov/devops-final-project:${{ env.IMAGE_TAG }} . \
+          docker tag diyanfilipov/devops-final-project:${{ env.IMAGE_TAG }} diyanfilipov/devops-final-project:latest
       - name: Log in to Docker Hub
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
         with:
@@ -27,7 +27,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Publish docker image
         #if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
-        run: docker push --all-tags ${{ secrets.DOCKERHUB_USERNAME }}/devops-final-project
+        run: docker push --all-tags diyanfilipov/devops-final-project
       - name: Context
         uses: okteto/context@latest
         with:
@@ -50,7 +50,7 @@ jobs:
         with:
           namespace: diyanfilipov
           manifest: k8s.yml
-          tag: ${{ secrets.DOCKERHUB_USERNAME }}/devops-final-project:${{ github.sha }}
+          tag: diyanfilipov/devops-final-project:${{ github.sha }}
           waitOn: deployment/devops-final-project
       - name: Verify
         uses: srt32/uptime@master
