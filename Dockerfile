@@ -5,4 +5,4 @@ EXPOSE 10333
 RUN mkdir -p /app/
 RUN mkdir -p /app/logs/
 ADD build/libs/devops-final-project-0.0.1.jar /app/app.jar
-ENTRYPOINT ["sh", "-c", "java -Dspring.profiles.active=${PROFILE} ${JAVA_OPTS} -jar /app//app.jar"]
+ENTRYPOINT ["sh", "-c", "java -Dspring.profiles.active=dev ${JAVA_OPTS} -jar /app/app.jar"]
