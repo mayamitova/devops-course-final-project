@@ -35,11 +35,11 @@ jobs:
         uses: okteto/context@latest
         with:
           token: ${{ secrets.OKTETO_TOKEN }}
-      - name: Build
-        uses: okteto/actions/build@v1
-        with:
-          token: ${{ secrets.OKTETO_TOKEN }}
-          tag: ${{ secrets.DOCKERHUB_USERNAME }}/devops-final-project:${{ github.sha }}
+#       - name: Build
+#         uses: okteto/actions/build@v1
+#         with:
+#           token: ${{ secrets.OKTETO_TOKEN }}
+#           tag: ${{ secrets.DOCKERHUB_USERNAME }}/devops-final-project:${{ github.sha }}
       - name: Get Kubeconfig
         uses: okteto/actions/namespace@v1
         id: kubeconf-step
