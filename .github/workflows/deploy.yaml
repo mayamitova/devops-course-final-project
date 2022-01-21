@@ -29,7 +29,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Publish docker image
-        if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+        #if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
         run: docker push --all-tags diyanfilipov/devops-final-project
 
 
