@@ -31,6 +31,10 @@ jobs:
       - name: Publish docker image
         #if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
         run: docker push --all-tags diyanfilipov/devops-final-project
+      - name: Context
+        uses: okteto/context@latest
+        with:
+          token: ${{ secrets.OKTETO_TOKEN }}
       - name: Build
         uses: okteto/actions/build@v1
         with:
@@ -57,11 +61,6 @@ jobs:
           url-to-hit: "https://devops-final-project-mayamitova.cloud.okteto.net"
           expected-statuses: "200"
 
-#      - name: Context
-#        uses: okteto/context@latest
-#        with:
-#          token: ${{ secrets.OKTETO_TOKEN }}
-#
 #      - name: Deploy preview environment
 #        uses: okteto/deploy-preview@latest
 #        env:
