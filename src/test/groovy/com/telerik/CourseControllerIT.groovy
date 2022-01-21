@@ -38,7 +38,7 @@ class CourseControllerIT {
 
   @BeforeEach
   void setUp() {
-    course = new Course(title: 'Telerik DevOps', presenter: 'Dani')
+    course = new Course(title: 'Telerik DevOps', presenter: 'Dido')
 
 
     course = courseRepository.save(course)
