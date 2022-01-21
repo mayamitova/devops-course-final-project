@@ -1,26 +1,48 @@
 # file: .github/workflows/preview.yaml
 on:
-  pull_request:
-    types: [ closed ]
+  push:
+#    types: [ closed ]
     branches:
       - test
 jobs:
   deploy_job:
     # this job will only run if the PR has been merged
-    if: github.event.pull_request.merged == true
+    #if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-    - run: |
+      - run: |
           echo PR #${{ github.event.number }} has been merged
-    - name: Context
-      uses: okteto/context@latest
-      with:
-        token: ${{ secrets.OKTETO_TOKEN }}
 
-    - name: Deploy preview environment
-      uses: okteto/deploy-preview@latest
-      env:
-       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        name: pr-${{ github.event.number }}-mayamitova
-        timeout: 15m
+      - uses: actions/checkout@v2
+      - name: Build project
+        run: ./gradlew build
+      - name: Build a Docker image
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t diyanfilipov/devops-final-project:${{ env.IMAGE_TAG }} . \
+
+          docker tag diyanfilipov/devops-final-project:${{ env.IMAGE_TAG }} diyanfilipov/devops-final-project:latest
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Publish docker image
+        if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+        run: docker push --all-tags diyanfilipov/devops-final-project
+
+
+
+#      - name: Context
+#        uses: okteto/context@latest
+#        with:
+#          token: ${{ secrets.OKTETO_TOKEN }}
+#
+#      - name: Deploy preview environment
+#        uses: okteto/deploy-preview@latest
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          name: pr-${{ github.event.number }}-mayamitova
+#          timeout: 15m
