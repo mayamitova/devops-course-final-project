@@ -3,6 +3,6 @@
 #sync:
 #  - .:/usr/src/app
 #forward:
-#  - 10333:10333
+#  - 8080:8080
 #persistentVolume:
 #  enabled: false

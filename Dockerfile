@@ -4,7 +4,7 @@ FROM openjdk:11
 RUN mkdir -p /app/
 RUN mkdir -p /app/logs/
 ADD build/libs/devops-final-project-0.0.1.jar /app/app.jar
-EXPOSE 10333
+EXPOSE 8080
 ENTRYPOINT ["sh", "-c", "java -Dspring.profiles.active=dev ${JAVA_OPTS} -jar /app/app.jar"]
 
 
@@ -29,5 +29,5 @@ ENTRYPOINT ["sh", "-c", "java -Dspring.profiles.active=dev ${JAVA_OPTS} -jar /ap
 #WORKDIR $APP_HOME
 #COPY --from=TEMP_BUILD_JAR $APP_HOME/build/libs/$ARTIFACT_NAME .
 #
-#EXPOSE 10333
+#EXPOSE 8080
 #ENTRYPOINT exec java -Dspring.profiles.active=dev -jar ${ARTIFACT_NAME}

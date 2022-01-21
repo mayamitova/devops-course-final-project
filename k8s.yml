@@ -32,6 +32,6 @@ spec:
   type: ClusterIP
   ports:
     - name: "devops-final-project"
-      port: 10333
+      port: 8080
   selector:
     app: devops-final-project

@@ -26,7 +26,7 @@ services:
     network_mode: bridge
     container_name: devopsfinalproject
     ports:
-      - "10333:10333"
+      - "8080:8080"
     restart: "no"
 #    depends_on:
 #      - mysql8
