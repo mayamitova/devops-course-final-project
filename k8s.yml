@@ -18,8 +18,23 @@ spec:
       containers:
         - image: diyanfilipov/devops-final-project
           name: devops-final-project
-          resources: {}
+          ports:
+          - containerPort: 8080
+---
 
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: devops-final-project-config
+data:
+  application.yml: |-
+    spring:
+     cloud:
+      kubernetes:
+        discovery:
+          all-namespaces: false
+          service-labels:
+            spring-boot: true
 ---
 
 apiVersion: v1
@@ -33,5 +48,6 @@ spec:
   ports:
     - name: "devops-final-project"
       port: 8080
+      targetPort: 8080
   selector:
     app: devops-final-project
