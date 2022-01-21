@@ -42,20 +42,20 @@ jobs:
         id: kubeconf-step
         with:
           token: ${{ secrets.OKTETO_TOKEN }}
-          namespace: diyanfilipov
+          namespace: diyanfilipov-taulia
       - name: Deploy and Wait
         uses: okteto/actions/deploy@v1
 #        env:
 #          KUBECONFIG: ${{ steps.kubeconf-step.outputs.kubeconfig }}
         with:
-          namespace: diyanfilipov
+          namespace: diyanfilipov-taulia
           manifest: k8s.yml
           tag: diyanfilipov/devops-final-project:${{ github.sha }}
           waitOn: deployment/devops-final-project
       - name: Verify
         uses: srt32/uptime@master
         with:
-          url-to-hit: "https://devops-final-project-diyanfilipov.cloud.okteto.net"
+          url-to-hit: "https://devops-final-project-diyanfilipov-taulia.cloud.okteto.net"
           expected-statuses: "200"
 
 #      - name: Deploy preview environment
