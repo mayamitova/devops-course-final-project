@@ -14,7 +14,8 @@ class CourseService {
   CourseRepository courseRepository
 
   Course getCourseById(Long id) {
-    courseRepository.getCourseById(id)
+//    courseRepository.getCourseById(id)
+    new Course(title: 'DevOps', presenter: 'Dani')
   }
 
   Course getCourseByTitle(String title) {

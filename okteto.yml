@@ -1,8 +1,8 @@
-name: devops-final-project
-command: ["bash"]
-sync:
-  - .:/usr/src/app
-forward:
-  - 10333:10333
-persistentVolume:
-  enabled: false
+#name: devops-final-project
+#command: ["bash"]
+#sync:
+#  - .:/usr/src/app
+#forward:
+#  - 10333:10333
+#persistentVolume:
+#  enabled: false
