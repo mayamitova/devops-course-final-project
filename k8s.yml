@@ -17,6 +17,8 @@ metadata:
   name: mysql         # Name of the resource
   labels:                         # Labels that will be applied to the resource
     app: mysql
+  annotations:
+    dev.okteto.com/auto-ingress: "true"
 spec:
   ports:
     - port: 3306
