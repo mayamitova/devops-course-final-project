@@ -48,17 +48,17 @@ jobs:
           namespace: mayamitova
       - name: Deploy and Wait
         uses: okteto/actions/deploy@v1
-        env:
-          KUBECONFIG: ${{ steps.kubeconf-step.outputs.kubeconfig }}
+#        env:
+#          KUBECONFIG: ${{ steps.kubeconf-step.outputs.kubeconfig }}
         with:
           namespace: mayamitova
           manifest: k8s.yml
-          tag: ${{ secrets.DOCKERHUB_USERNAME }}/devops-final-project:${{ github.sha }}
+          tag: mayamitova/devops-final-project:${{ github.sha }}
           waitOn: deployment/devops-final-project
       - name: Verify
         uses: srt32/uptime@master
         with:
-          url-to-hit: "https://devops-final-project-mayamitova.cloud.okteto.net"
+          url-to-hit: "https://devops-final-project-mayamitova.cloud.okteto.net/course/1"
           expected-statuses: "200"
 
 #      - name: Deploy preview environment
