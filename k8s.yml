@@ -43,7 +43,7 @@ spec:
   type: ClusterIP  
   ports:
   - name: "devops-final-project"
-    port: 8080
-    targetPort: 8080
+    port: 10333
+    targetPort: 10333
   selector:
     app: devops-final-project
