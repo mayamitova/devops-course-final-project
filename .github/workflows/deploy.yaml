@@ -13,8 +13,8 @@ jobs:
       - run: |
           echo PR #${{ github.event.number }} has been merged
       - uses: actions/checkout@v2
-#      - name: Build project
-#        run: ./gradlew build
+      - name: Build project
+        run: ./gradlew build
       - name: Build a Docker image
         env:
           IMAGE_TAG: ${{ github.sha }}
