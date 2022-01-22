@@ -14,7 +14,7 @@ spec:
         app: devops-final-project
     spec:
       containers:
-      - image: mayamitova/devops-final-project
+      - image: diyanfilipov/devops-final-project
         name: devops-final-project
 ---
 
