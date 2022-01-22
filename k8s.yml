@@ -47,22 +47,22 @@ spec:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:                # Read environment variables from kubernetes secrets
                 secretKeyRef:
-                  name: mysql-root-pass
-                  key: password
+                  name: devops-course-db
+                  key: rootpassword
             - name: MYSQL_DATABASE
               valueFrom:
                 secretKeyRef:
-                  name: mysql-db-url
+                  name: devops-course-db
                   key: database
             - name: MYSQL_USER
               valueFrom:
                 secretKeyRef:
-                  name: mysql-user-pass
+                  name: devops-course-db
                   key: username
             - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mysql-user-pass
+                  name: devops-course-db
                   key: password
           ports:
             - containerPort: 3306        # The port that the container exposes
