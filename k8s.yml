@@ -14,9 +14,23 @@ spec:
         app: devops-final-project
     spec:
       containers:
-      - image: okteto/devops-final-project:telerik
+      - image: mayamitova/devops-final-project
         name: devops-final-project
+---
 
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: devops-final-project-config
+data:
+  application.yml: |-
+    spring:
+     cloud:
+      kubernetes:
+        discovery:
+          all-namespaces: false
+          service-labels:
+            spring-boot: true
 ---
 
 apiVersion: v1
