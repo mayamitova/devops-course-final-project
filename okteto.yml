@@ -1,4 +1,4 @@
-name: devops-course-final-project
+name: devops-final-project
 image: okteto/gradle:7.3
 command: bash
 volumes:
