@@ -1,50 +1,57 @@
+## PVC
+kind: PersistentVolumeClaim
 apiVersion: v1
-kind: PersistentVolumeClaim        # Create a PersistentVolumeClaim to request a PersistentVolume storage
-metadata:                          # Claim name and labels
-  name: mysql-pv-claim
-  labels:
-    app: polling-app
-spec:                              # Access mode and resource limits
-  accessModes:
-    - ReadWriteOnce                # ReadWriteOnce means the volume can be mounted as read-write by a single Node
+metadata:
+  name: mysql
+spec:
   resources:
     requests:
-      storage: 1Gi
----
-apiVersion: v1                    # API version
-kind: Service                     # Type of kubernetes resource
-metadata:
-  name: mysql         # Name of the resource
-  labels:                         # Labels that will be applied to the resource
-    app: mysql
-  annotations:
-    dev.okteto.com/auto-ingress: "true"
-spec:
-  ports:
-    - port: 3306
-  selector:                       # Selects any Pod with labels `app=polling-app,tier=mysql`
-    app: mysql
----
-apiVersion: apps/v1
-kind: Deployment                    # Type of the kubernetes resource
-metadata:
-  name: mysql           # Name of the deployment
-  labels:                           # Labels applied to this deployment
-    app: mysql
-spec:
+      storage: 1Gi        #Setting pvc storage resource size
+  accessModes:
+    - ReadWriteOnce
   selector:
-    matchLabels:                    # This deployment applies to the Pods matching the specified labels
+    matchLabels:
+      app: mysql           #Select the PV according to the Label
+---
+## Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  type: NodePort
+  ports:
+    - name: mysql
+      port: 3306
+      targetPort: 3306
+      nodePort: 30336
+  selector:
+    app: mysql
+---
+## Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
       app: mysql
-  strategy:
-    type: Recreate
-  template:                         # Template for the Pods in this deployment
+  template:
     metadata:
-      labels:                       # Labels to be applied to the Pods in this deployment
+      labels:
         app: mysql
-    spec:                           # The spec for the containers that will be run inside the Pods in this deployment
+    spec:
       containers:
-        - image: mysql:8.0.19          # The container image
-          name: mysql
+        - name: mysql
+          image: mysql:8.0.19
+          ports:
+            - containerPort: 3306
           env:                        # Environment variables passed to the container
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:                # Read environment variables from kubernetes secrets
@@ -66,16 +73,131 @@ spec:
                 secretKeyRef:
                   name: devops-course-db
                   key: password
-          ports:
-            - containerPort: 3306        # The port that the container exposes
-              name: mysql
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 512Mi
+            requests:
+              cpu: 2000m
+              memory: 512Mi
+          livenessProbe:
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+            exec:
+              command: ["mysqladmin", "-uroot", "-p${MYSQL_ROOT_PASSWORD}", "ping"]
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+            exec:
+              command: ["mysqladmin", "-uroot", "-p${MYSQL_ROOT_PASSWORD}", "ping"]
           volumeMounts:
-            - name: mysql-persistent-storage  # This name should match the name specified in `volumes.name`
+            - name: data
               mountPath: /var/lib/mysql
-      volumes:                       # A PersistentVolume is mounted as a volume to the Pod
-        - name: mysql-persistent-storage
+            - name: config
+              mountPath: /etc/mysql/conf.d/my.cnf
+              subPath: my.cnf
+            - name: localtime
+              readOnly: true
+              mountPath: /etc/localtime
+      volumes:
+        - name: data
           persistentVolumeClaim:
-            claimName: mysql-pv-claim
+            claimName: mysql
+        - name: config
+          configMap:
+            name: mysql-config
+        - name: localtime
+          hostPath:
+            type: File
+            path: /etc/localtime
+
+
+
+
+#apiVersion: v1
+#kind: PersistentVolumeClaim        # Create a PersistentVolumeClaim to request a PersistentVolume storage
+#metadata:                          # Claim name and labels
+#  name: mysql-pv-claim
+#  labels:
+#    app: polling-app
+#spec:                              # Access mode and resource limits
+#  accessModes:
+#    - ReadWriteOnce                # ReadWriteOnce means the volume can be mounted as read-write by a single Node
+#  resources:
+#    requests:
+#      storage: 1Gi
+#---
+#apiVersion: v1                    # API version
+#kind: Service                     # Type of kubernetes resource
+#metadata:
+#  name: mysql         # Name of the resource
+#  labels:                         # Labels that will be applied to the resource
+#    app: mysql
+#  annotations:
+#    dev.okteto.com/auto-ingress: "true"
+#spec:
+#  ports:
+#    - port: 3306
+#  selector:                       # Selects any Pod with labels `app=polling-app,tier=mysql`
+#    app: mysql
+#---
+#apiVersion: apps/v1
+#kind: Deployment                    # Type of the kubernetes resource
+#metadata:
+#  name: mysql           # Name of the deployment
+#  labels:                           # Labels applied to this deployment
+#    app: mysql
+#spec:
+#  selector:
+#    matchLabels:                    # This deployment applies to the Pods matching the specified labels
+#      app: mysql
+#  strategy:
+#    type: Recreate
+#  template:                         # Template for the Pods in this deployment
+#    metadata:
+#      labels:                       # Labels to be applied to the Pods in this deployment
+#        app: mysql
+#    spec:                           # The spec for the containers that will be run inside the Pods in this deployment
+#      containers:
+#        - image: mysql:8.0.19          # The container image
+#          name: mysql
+#          env:                        # Environment variables passed to the container
+#            - name: MYSQL_ROOT_PASSWORD
+#              valueFrom:                # Read environment variables from kubernetes secrets
+#                secretKeyRef:
+#                  name: devops-course-db
+#                  key: rootpassword
+#            - name: MYSQL_DATABASE
+#              valueFrom:
+#                secretKeyRef:
+#                  name: devops-course-db
+#                  key: database
+#            - name: MYSQL_USER
+#              valueFrom:
+#                secretKeyRef:
+#                  name: devops-course-db
+#                  key: username
+#            - name: MYSQL_PASSWORD
+#              valueFrom:
+#                secretKeyRef:
+#                  name: devops-course-db
+#                  key: password
+#          ports:
+#            - containerPort: 3306        # The port that the container exposes
+#              name: mysql
+#          volumeMounts:
+#            - name: mysql-persistent-storage  # This name should match the name specified in `volumes.name`
+#              mountPath: /var/lib/mysql
+#      volumes:                       # A PersistentVolume is mounted as a volume to the Pod
+#        - name: mysql-persistent-storage
+#          persistentVolumeClaim:
+#            claimName: mysql-pv-claim
 
 #apiVersion: apps/v1
 #kind: Deployment
