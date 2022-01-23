@@ -19,9 +19,9 @@ jobs:
         env:
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t diyanfilipov/devops-final-project:${{ env.IMAGE_TAG }} . \
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/devops-final-project:${{ env.IMAGE_TAG }} . \
 
-          docker tag diyanfilipov/devops-final-project:${{ env.IMAGE_TAG }} diyanfilipov/devops-final-project:latest
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/devops-final-project:${{ env.IMAGE_TAG }} ${{ secrets.DOCKERHUB_USERNAME }}/devops-final-project:latest
       - name: Log in to Docker Hub
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
         with:
@@ -29,7 +29,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Publish docker image
         #if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
-        run: docker push --all-tags diyanfilipov/devops-final-project
+        run: docker push --all-tags ${{ secrets.DOCKERHUB_USERNAME }}/devops-final-project
       - name: Context
         uses: okteto/context@latest
         with:
@@ -44,23 +44,23 @@ jobs:
         id: kubeconf-step
         with:
           token: ${{ secrets.OKTETO_TOKEN }}
-          namespace: mayamitova
+          namespace: ${{ secrets.OKTETO_NAMESPACE }}
       - name: Deploy and Wait
         uses: okteto/actions/deploy@v1
 #        env:
 #          KUBECONFIG: ${{ steps.kubeconf-step.outputs.kubeconfig }}
         with:
-          namespace: mayamitova
+          namespace: ${{ secrets.OKTETO_NAMESPACE }}
           manifest: k8s.yml
-          tag: diyanfilipov/devops-final-project:${{ github.sha }}
+          tag: ${{ secrets.DOCKERHUB_USERNAME }}/devops-final-project:${{ github.sha }}
           waitOn: deployment/devops-final-project
-      - name: Sleep for 60 seconds
-        run: sleep 60s
+      - name: Sleep for 90 seconds
+        run: sleep 90s
         shell: bash
       - name: Verify
         uses: srt32/uptime@master
         with:
-          url-to-hit: "https://devops-final-project-mayamitova.cloud.okteto.net/course/1"
+          url-to-hit: https://devops-final-project-${{ secrets.OKTETO_NAMESPACE }}.cloud.okteto.net/course/1
           expected-statuses: "200"
 
 #      - name: Deploy preview environment
