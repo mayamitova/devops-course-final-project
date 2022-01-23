@@ -16,4 +16,5 @@ class Course {
 
   String title
   String presenter
+  boolean certified
 }
