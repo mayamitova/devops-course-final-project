@@ -46,6 +46,8 @@ spec:
         - image: mysql:8.0.19          # The container image
           name: mysql
           env:                        # Environment variables passed to the container
+            # all passwords are previously created with
+            # kubectl create secret generic devops-course-db --from-literal=root-usr-pass=admin --from-literal=username=devopscoursedbuser --from-literal=password=test1234 --from-literal=database=devops-course-db -o yaml [--dry-run=client]
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:                # Read environment variables from kubernetes secrets
                 secretKeyRef:
