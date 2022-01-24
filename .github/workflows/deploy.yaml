@@ -1,13 +1,13 @@
 # file: .github/workflows/preview.yaml
 on:
-  push:
-#    types: [ closed ]
+  pull_request:
+    types: [ closed ]
     branches:
-      - test
+      - main
 jobs:
-  deploy_app_job:
+  build_and_publish_image_job:
     # this job will only run if the PR has been merged
-    #if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - run: |
@@ -28,17 +28,17 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Publish docker image
-        #if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
         run: docker push --all-tags ${{ secrets.DOCKERHUB_USERNAME }}/devops-final-project
+  deploy_app_job:
+    # this job will only run if the PR has been merged
+    if: github.event.pull_request.merged == true
+    needs: build_and_publish_image_job
+    runs-on: ubuntu-latest
+    steps:
       - name: Context
         uses: okteto/context@latest
         with:
           token: ${{ secrets.OKTETO_TOKEN }}
-#       - name: Build
-#         uses: okteto/actions/build@v1
-#         with:
-#           token: ${{ secrets.OKTETO_TOKEN }}
-#           tag: ${{ secrets.DOCKERHUB_USERNAME }}/devops-final-project:${{ github.sha }}
       - name: Get Kubeconfig
         uses: okteto/actions/namespace@v1
         id: kubeconf-step
@@ -47,8 +47,6 @@ jobs:
           namespace: ${{ secrets.OKTETO_NAMESPACE }}
       - name: Deploy and Wait
         uses: okteto/actions/deploy@v1
-#        env:
-#          KUBECONFIG: ${{ steps.kubeconf-step.outputs.kubeconfig }}
         with:
           namespace: ${{ secrets.OKTETO_NAMESPACE }}
           manifest: k8s.yml
@@ -63,10 +61,3 @@ jobs:
           url-to-hit: https://devops-final-project-${{ secrets.OKTETO_NAMESPACE }}.cloud.okteto.net/course/1
           expected-statuses: "200"
 
-#      - name: Deploy preview environment
-#        uses: okteto/deploy-preview@latest
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          name: pr-${{ github.event.number }}-mayamitova
-#          timeout: 15m
