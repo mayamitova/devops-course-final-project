@@ -6,6 +6,8 @@ import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RestController
 
 @Slf4j
@@ -25,4 +27,21 @@ class CourseController {
   Course getCourseByTitle(@PathVariable ('title') String title) {
     courseService.getCourseByTitle(title)
   }
+
+  @GetMapping("/course/list")
+  List<Course> getAllCourses() {
+    courseService.getAllCourses()
+  }
+
+  @PostMapping("/course")
+  Course addCourse(Course course) {
+    courseService.saveCourse(course)
+  }
+
+  @PutMapping("/course")
+  Course updateCourse(Course course) {
+    courseService.saveCourse(course)
+  }
+
+
 }
