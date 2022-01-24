@@ -2,6 +2,11 @@ plugins {
 	id 'org.springframework.boot' version '2.6.2'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'groovy'
+	id "org.sonarqube" version "3.3"
+	id 'jacoco'
+	id 'org.flywaydb.flyway' version '8.4.2'
+//	id 'com.bmuschko.docker-remote-api' version '7.0.1'
+//	id 'com.palantir.docker' version '0.22.1'
 }
 
 group = 'com.telerik'
@@ -18,10 +23,48 @@ dependencies {
 	implementation 'org.codehaus.groovy:groovy'
 	implementation 'org.flywaydb:flyway-core'
 	runtimeOnly 'mysql:mysql-connector-java'
-	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'com.h2database:h2:2.0.206'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-test {
-	useJUnitPlatform()
+sonarqube {
+	properties {
+		property "sonar.login", System.getProperty('SONAR_TOKEN')
+	}
 }
+
+test {
+	// use Junit 5
+	useJUnitPlatform()
+
+	jacoco {
+		destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
+		classDumpDir = file("$buildDir/jacoco/classpathdumps")
+	}
+}
+
+
+tasks.named('sonarqube').configure {
+	dependsOn test
+}
+
+//tasks.register('dockerBuildImage', DockerBuildImage) {
+//	inputDir = file('.')
+//	tag = 'telerik/devops-final-project'
+//	configure {
+//		dependsOn build
+//	}
+//}
+
+//docker {
+//	name "telerik/${project.name}:${project.version}"
+//	files "build/libs/build/libs/devops-final-project-${project.version}.jar"
+//}
+
+
+jacocoTestReport {
+	reports {
+		xml.enabled true
+	}
+}
+test.finalizedBy jacocoTestReport
