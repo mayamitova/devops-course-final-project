@@ -21,4 +21,12 @@ class CourseService {
   Course getCourseByTitle(String title) {
     courseRepository.getCourseByTitle(title)
   }
+
+  List<Course> getAllCourses() {
+    courseRepository.findAll() as List<Course>
+  }
+
+  Course saveCourse(Course course) {
+    courseRepository.save(course)
+  }
 }
