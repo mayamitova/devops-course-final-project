@@ -1,4 +1,7 @@
 name: CD workflow
+env:
+  ARTIFACT_NAME: 'devops-final-project'
+
 on:
   pull_request:
     types: [ closed ]
