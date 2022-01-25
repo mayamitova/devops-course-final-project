@@ -1,1 +1,1 @@
-UPDATE course SET certified = 1 WHERE name = 'Upskill DevOps';
+UPDATE course SET certified = 0 WHERE title = 'Upskill DevOps';
