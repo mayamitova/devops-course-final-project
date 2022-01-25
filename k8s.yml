@@ -46,13 +46,13 @@ spec:
         - image: mysql:8.0.19          # The container image
           name: mysql
           env:                        # Environment variables passed to the container
-            # all passwords are previously created with `kubectl create secret generic ....` command
-            # kubectl create secret generic devops-course-db --from-literal=root-usr-pass=<rootpwd> --from-literal=username=<usr> --from-literal=password=<usrpwd> --from-literal=database=devops-course-db -o yaml [--dry-run=client]
+            # all passwords are previously created with
+            # kubectl create secret generic devops-course-db --from-literal=rootpassword=*** --from-literal=username=devopscoursedbuser --from-literal=password=*** --from-literal=database=devops-course-db
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:                # Read environment variables from kubernetes secrets
                 secretKeyRef:
                   name: devops-course-db
-                  key: rootpassword
+                  key: rootpasswordkey
             - name: MYSQL_DATABASE
               valueFrom:
                 secretKeyRef:
@@ -67,7 +67,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: devops-course-db
-                  key: password
+                  key: passwordkey
           ports:
             - containerPort: 3306        # The port that the container exposes
               name: mysql
@@ -78,55 +78,6 @@ spec:
         - name: mysql-persistent-storage
           persistentVolumeClaim:
             claimName: mysql-pv-claim
-
-#apiVersion: apps/v1
-#kind: Deployment
-#metadata:
-#  name: mysql
-#spec:
-#  selector:
-#    matchLabels:
-#      app: mysql
-#  strategy:
-#    type: Recreate
-#  template:
-#    metadata:
-#      labels:
-#        app: mysql
-#    spec:
-#      containers:
-#        - image: mysql:5.6
-#          name: mysql
-#          env:
-#            - name: MYSQL_ROOT_PASSWORD
-#              valueFrom:
-#                secretKeyRef:
-#                  name: mysql-secret
-#                  key: password
-#          ports:
-#            - containerPort: 3306
-#              name: mysql
-#          volumeMounts:
-#            - name: mysql-persistent-storage
-#              mountPath: /var/lib/mysql
-#      volumes:
-#        - name: mysql-persistent-storage
-#          persistentVolumeClaim:
-#            claimName: mysql-pv-claim
-#---
-#
-#apiVersion: v1
-#kind: Service
-#metadata:
-#  name: mysql
-#  annotations:
-#    dev.okteto.com/auto-ingress: "true"
-#spec:
-#  ports:
-#    - port: 3306
-#      targetPort: 3306
-#  selector:
-#    app: mysql
 ---
 
 apiVersion: apps/v1
@@ -151,7 +102,7 @@ spec:
             valueFrom: # Read environment variables from kubernetes secrets
               secretKeyRef:
                 name: devops-course-db
-                key: rootpassword
+                key: rootpasswordkey
           - name: MYSQL_DATABASE
             valueFrom:
               secretKeyRef:
@@ -166,7 +117,14 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: devops-course-db
-                key: password
+                key: passwordkey
+          - name: NEW_RELIC_LICENSE_KEY # previously added via `kubectl create secret generic devops-course-newrelic --from-literal=newreliclicense=YOUR_NR_TOKEN`
+            valueFrom:
+              secretKeyRef:
+                name: devops-course-newrelic
+                key: newreliclicense
+          - name: SPRING_PROFILE
+            value: integration
 ---
 
 kind: ConfigMap
@@ -176,12 +134,12 @@ metadata:
 data:
   application.yml: |-
     spring:
-     cloud:
-      kubernetes:
-        discovery:
-          all-namespaces: false
-          service-labels:
-            spring-boot: true
+      cloud:
+        kubernetes:
+          discovery:
+            all-namespaces: false
+              service-labels:
+                spring-boot: true
 ---
 
 apiVersion: v1

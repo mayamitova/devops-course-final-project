@@ -1,4 +1,4 @@
-# file: .github/workflows/preview.yaml
+name: CD workflow
 on:
   pull_request:
     types: [ closed ]
@@ -9,26 +9,32 @@ jobs:
     # this job will only run if the PR has been merged
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     steps:
+      - uses: act10ns/slack@v1
+        with:
+          status: starting
+          message: Starting Docker Build and Push...
+          if: always()
       - run: |
           echo PR #${{ github.event.number }} has been merged
       - uses: actions/checkout@v2
-      - name: Build project
-        run: ./gradlew build
+      - name: Set GitHub Revision
+        run: echo PROJECT_SHA="$(echo $GITHUB_SHA | cut -c 1-6)" >> $GITHUB_ENV
+      - name: Set Project version
+        run: echo PROJECT_VERSION="$(./gradlew properties --no-daemon -q | grep version | awk '{print $2}')" >> $GITHUB_ENV
       - name: Build a Docker image
         env:
           IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/devops-final-project:${{ env.IMAGE_TAG }} . \
-
-          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/devops-final-project:${{ env.IMAGE_TAG }} ${{ secrets.DOCKERHUB_USERNAME }}/devops-final-project:latest
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.ARTIFACT_NAME }}-${{ env.PROJECT_VERSION }}:${{ env.PROJECT_SHA }} .
       - name: Log in to Docker Hub
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Publish docker image
-        run: docker push --all-tags ${{ secrets.DOCKERHUB_USERNAME }}/devops-final-project
+        run: docker push --all-tags ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.ARTIFACT_NAME }}-${{ env.PROJECT_VERSION }}
   deploy_app_job:
     # this job will only run if the PR has been merged
     if: github.event.pull_request.merged == true
@@ -51,7 +57,7 @@ jobs:
         with:
           namespace: ${{ secrets.OKTETO_NAMESPACE }}
           manifest: k8s.yml
-          tag: ${{ secrets.DOCKERHUB_USERNAME }}/devops-final-project:${{ github.sha }}
+          tag: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.ARTIFACT_NAME }}-${{ env.PROJECT_VERSION }}:${{ env.PROJECT_SHA }}
           waitOn: deployment/devops-final-project
       - name: Sleep for 90 seconds
         run: sleep 90s
@@ -61,4 +67,8 @@ jobs:
         with:
           url-to-hit: https://devops-final-project-${{ secrets.OKTETO_NAMESPACE }}.cloud.okteto.net/course/1
           expected-statuses: "200"
-
+      - uses: act10ns/slack@v1
+        with:
+          status: ${{ job.status }}
+          steps: ${{ toJson(steps) }}
+        if: always()
