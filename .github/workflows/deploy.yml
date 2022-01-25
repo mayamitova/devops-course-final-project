@@ -44,6 +44,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Set GitHub Revision
+        run: echo PROJECT_SHA="$(echo $GITHUB_SHA | cut -c 1-6)" >> $GITHUB_ENV
+      - name: Set Project version
+        run: echo PROJECT_VERSION="$(./gradlew properties --no-daemon -q | grep version | awk '{print $2}')" >> $GITHUB_ENV
       - name: Context
         uses: okteto/context@latest
         with:
