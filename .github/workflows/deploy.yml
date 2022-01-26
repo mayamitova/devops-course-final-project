@@ -63,7 +63,7 @@ jobs:
         with:
           namespace: ${{ secrets.OKTETO_NAMESPACE }}
           manifest: k8s.yml
-          tag: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.ARTIFACT_NAME }}-${{ env.PROJECT_VERSION }}:${{ env.PROJECT_SHA }}
+          tag: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.ARTIFACT_NAME }}:${{ env.PROJECT_SHA }}
           waitOn: deployment/devops-final-project
       - name: Sleep for 90 seconds
         run: sleep 90s
